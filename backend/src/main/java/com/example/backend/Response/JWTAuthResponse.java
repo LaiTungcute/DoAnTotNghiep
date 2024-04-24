@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Setter
 @Getter
 @NoArgsConstructor
@@ -12,4 +14,5 @@ import lombok.Setter;
 public class JWTAuthResponse {
     private String accessToken;
     private String tokenType = "Bearer";
+    private UserResponse user;
 }

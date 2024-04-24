@@ -21,7 +21,4 @@ public class Gender {
 
     @Column(name = "gender_name")
     private String genderName;
-
-    @OneToOne(mappedBy = "gender")
-    private Product product;
 }

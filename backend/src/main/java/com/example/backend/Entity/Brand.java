@@ -30,10 +30,6 @@ public class Brand {
     @Column(name = "image")
     private String image;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(name = "Brand_category",
-            joinColumns = @JoinColumn(name = "brand_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id")
-    )
-    private Set<Category> categories;
+    @OneToMany(mappedBy = "brand")
+    private Set<Product> products;
 }

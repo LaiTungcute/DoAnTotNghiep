@@ -1,5 +1,6 @@
 package com.example.backend.Entity;
 
+import com.example.backend.Entity.Key.ProductKey;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,6 +21,9 @@ public class Product {
     @Column(name = "product_id")
     private int id;
 
+//    @EmbeddedId
+//    private ProductKey id;
+
     @Column(name = "product_name")
     private String productName;
 
@@ -27,7 +31,7 @@ public class Product {
     private String description;
 
     @Column(name = "price")
-    private String price;
+    private long price;
 
     @Column(name = "image")
     private String image;
@@ -42,6 +46,10 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
+
+    @ManyToOne
+    @JoinColumn(name = "brand_id")
+    private Brand brand;
 
     @OneToMany(mappedBy = "product")
     private Set<OrderDetail> orderDetails;

@@ -29,7 +29,4 @@ public class Category {
 
     @OneToMany(mappedBy = "category")
     private Set<Product> products;
-
-    @ManyToMany(mappedBy = "categories")
-    private Set<Brand> brands;
 }

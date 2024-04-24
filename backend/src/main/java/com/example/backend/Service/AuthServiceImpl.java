@@ -3,6 +3,9 @@ package com.example.backend.Service;
 import com.example.backend.Config.Jwt.JwtTokenProvider;
 import com.example.backend.DTO.LoginDTO;
 import com.example.backend.Repository.UserRepository;
+import com.example.backend.Response.JWTAuthResponse;
+import com.example.backend.Response.UserResponse;
+import com.example.backend.Service.Imp.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,8 +14,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
-public class AuthServiceImpl implements AuthService{
+public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -39,15 +45,28 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
-    public String login(LoginDTO loginDto) {
+    public JWTAuthResponse login(LoginDTO loginDto) {
+        JWTAuthResponse response = new JWTAuthResponse();
+           Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                   loginDto.getUsername(), loginDto.getPassword()));
+           SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                loginDto.getUsername(), loginDto.getPassword()));
+           String token = jwtTokenProvider.generateToken(authentication);
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+           UserDetailImp userDetails = (UserDetailImp) authentication.getPrincipal();
 
-        String token = jwtTokenProvider.generateToken(authentication);
+           List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority()).collect(Collectors.toList());
 
-        return token;
+           long userId = userDetails.getId();
+           String username = userDetails.getUsername();
+           String email = userDetails.getEmail();
+           String phoneNumber = userDetails.getPhoneNumber();
+
+        UserResponse userResponse = new UserResponse(userId, username, email, phoneNumber, roles);
+
+           response.setAccessToken(token);
+           response.setUser(userResponse);
+
+        return response;
     }
 }
