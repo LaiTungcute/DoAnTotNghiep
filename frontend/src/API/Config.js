@@ -1,9 +1,14 @@
 import axios from "axios";
 
+const token = localStorage.getItem("access_token");
+
 const instance = axios.create({
   baseURL: "http://localhost:8080/api",
   timeout: 1000,
-  headers: { "X-Custom-Header": "foobar" },
+  headers: {
+    "X-Custom-Header": "foobar",
+    Authorization: `Bearer ${token}`,
+  },
 });
 
 // instance.defaults.headers.common["Authorization"] = AUTH_TOKEN;

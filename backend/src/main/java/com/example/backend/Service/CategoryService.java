@@ -37,7 +37,7 @@ public class CategoryService implements CategoryServiceImp {
         List<Category> categories = categoryRepository.findAll();
         List<CategoryResponse> categoryResponses = new ArrayList<>();
         for (Category category : categories) {
-            CategoryResponse categoryResponse = new CategoryResponse(category.getCategoryName());
+            CategoryResponse categoryResponse = new CategoryResponse(category.getId(), category.getCategoryName());
 
             categoryResponses.add(categoryResponse);
         }
@@ -49,7 +49,7 @@ public class CategoryService implements CategoryServiceImp {
     public CategoryResponse getCategoryById(int id) {
         Category category = categoryRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("Category with "+ id + " is not exist"));
 
-        CategoryResponse categoryResponse = new CategoryResponse(category.getCategoryName());
+        CategoryResponse categoryResponse = new CategoryResponse(category.getId(), category.getCategoryName());
 
         return categoryResponse;
     }

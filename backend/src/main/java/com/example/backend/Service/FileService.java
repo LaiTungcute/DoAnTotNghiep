@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 @Service
 public class FileService implements FileServiceImp {
@@ -32,7 +33,7 @@ public class FileService implements FileServiceImp {
     public boolean saveFile(MultipartFile file) {
         init();
         try {
-            Files.copy(file.getInputStream(), root.resolve(file.getOriginalFilename()));
+            Files.copy(file.getInputStream(), root.resolve(file.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
             return true;
         }catch (Exception e) {
             System.out.println("Error save file: "+ e.getMessage());

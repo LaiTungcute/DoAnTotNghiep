@@ -1,12 +1,14 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUserCircle } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCartShopping,
+  faUserCircle,
+} from "@fortawesome/free-solid-svg-icons";
 
 const Navbar = () => {
-  const loggedInUser = useSelector((state) => state.user.current);
-  const isLoggedIn = !!loggedInUser.id;
+  const accessToken = localStorage.getItem("access_token");
 
   return (
     <nav className="bg-gray-800 p-4">
@@ -17,16 +19,26 @@ const Navbar = () => {
           </Link>
         </div>
         <div className="space-x-4">
-          {!isLoggedIn ? (
+          {!accessToken && (
             <Link to="/login" className="text-white hover:text-gray-400">
               Đăng nhập
             </Link>
-          ) : (
-            <FontAwesomeIcon
-              icon={faUserCircle}
-              style={{ color: "white", fontSize: "25px" }}
-            />
           )}
+          {accessToken && (
+            <Link to="/userInfo">
+              <FontAwesomeIcon
+                icon={faUserCircle}
+                style={{ color: "white", fontSize: "25px" }}
+              />
+            </Link>
+          )}
+
+          <Link to="/order">
+            <FontAwesomeIcon
+              icon={faCartShopping}
+              style={{ color: "white", fontSize: "25px", marginLeft: "30px" }}
+            />
+          </Link>
         </div>
       </div>
     </nav>

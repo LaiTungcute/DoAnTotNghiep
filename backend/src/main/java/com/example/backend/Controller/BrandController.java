@@ -39,8 +39,8 @@ public class BrandController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<?> getAllBrand(@RequestParam(value = "pageNum", defaultValue = "0") int pageNum, @RequestParam(value = "pageSize", defaultValue = "6") int pageSize) {
-        List<BrandResponse> brandResponseList = brandServiceImp.getAllBrands(pageNum, pageSize);
+    public ResponseEntity<?> getAllBrand() {
+        List<BrandResponse> brandResponseList = brandServiceImp.getAllBrands();
         return ResponseEntity.ok(brandResponseList);
     }
 

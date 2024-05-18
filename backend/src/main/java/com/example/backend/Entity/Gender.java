@@ -1,10 +1,13 @@
 package com.example.backend.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Table(name = "Gender")
@@ -21,4 +24,8 @@ public class Gender {
 
     @Column(name = "gender_name")
     private String genderName;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "gender")
+    private List<Product> products;
 }

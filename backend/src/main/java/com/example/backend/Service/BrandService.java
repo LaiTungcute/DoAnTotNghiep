@@ -41,10 +41,9 @@ public class BrandService implements BrandServiceImp {
     }
 
     @Override
-    public List<BrandResponse> getAllBrands(int pageNum, int pageSize) {
+    public List<BrandResponse> getAllBrands() {
 
-        PageRequest pageRequest = PageRequest.of(pageNum, pageSize);
-        Page<Brand> listData = brandRepository.findAll(pageRequest);
+        List<Brand> listData = brandRepository.findAll();
 
         List<BrandResponse> brandResponses = new ArrayList<>();
 

@@ -1,5 +1,6 @@
 package com.example.backend.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,6 +28,7 @@ public class Category {
     @Column(name = "created_date")
     private Date createdDate;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "category")
     private Set<Product> products;
 }

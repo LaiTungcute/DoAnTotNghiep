@@ -1,6 +1,6 @@
 package com.example.backend.Entity;
 
-import com.example.backend.Entity.Key.ProductKey;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,9 +21,6 @@ public class Product {
     @Column(name = "product_id")
     private int id;
 
-//    @EmbeddedId
-//    private ProductKey id;
-
     @Column(name = "product_name")
     private String productName;
 
@@ -39,7 +36,7 @@ public class Product {
     @Column(name = "qty")
     private int qty;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "gender_id")
     private Gender gender;
 
@@ -51,6 +48,7 @@ public class Product {
     @JoinColumn(name = "brand_id")
     private Brand brand;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "product")
     private Set<OrderDetail> orderDetails;
 }

@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductResponse {
+    private int productId;
     private String productName;
     private String description;
     private long price;

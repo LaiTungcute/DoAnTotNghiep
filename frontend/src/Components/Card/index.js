@@ -48,14 +48,14 @@ const CardItem = ({ image, title, price, onButtonClick }) => {
         <h3 className="font-semibold text-lg">{title}</h3>
 
         {/* Giá */}
-        <p className="text-gray-700 mb-4">{price}</p>
+        <p className="text-gray-700 mb-4">Giá bán: {price}</p>
 
         {/* Nút hành động */}
         <button
           className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
           onClick={onButtonClick}
         >
-          Thực hiện hành động
+          Xem chi tiết
         </button>
       </div>
     </div>

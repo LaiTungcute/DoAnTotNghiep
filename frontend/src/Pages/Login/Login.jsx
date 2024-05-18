@@ -13,6 +13,8 @@ import { unwrapResult } from "@reduxjs/toolkit";
 const Login = () => {
   const dispatch = useDispatch();
 
+  const navigate = useNavigate();
+
   // Xác thực form với Yup
   const validationSchema = Yup.object({
     username: Yup.string().required("Email là bắt buộc"),
@@ -25,15 +27,12 @@ const Login = () => {
       const action = login(values);
       const resultAction = await dispatch(action);
       const datas = unwrapResult(resultAction);
-      // const message = data.data;
-      // showToast(message, "success");
-      console.log("Data: ", datas);
+
+      navigate("/");
     } catch (error) {
       // showToast(error.message, "error");
     }
   };
-
-  const navigate = useNavigate();
 
   const handleRegister = () => {
     navigate("/register");

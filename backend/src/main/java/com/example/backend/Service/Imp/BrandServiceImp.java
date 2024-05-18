@@ -10,7 +10,7 @@ import java.util.List;
 public interface BrandServiceImp {
     boolean isInsert(BrandDTO brand);
 
-    List<BrandResponse> getAllBrands(int pageNum, int pageSize);
+    List<BrandResponse> getAllBrands();
 
     BrandResponse getBrandById(int id);
 

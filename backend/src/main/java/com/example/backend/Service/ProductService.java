@@ -44,7 +44,7 @@ public class ProductService implements ProductServiceImp {
         boolean isSuccess = fileServiceImp.saveFile(productDTO.getImage());
         if(isSuccess) {
             Product product = new Product();
-            product.setProductName(productDTO.getBrandName());
+            product.setProductName(productDTO.getProductName());
             product.setDescription(productDTO.getDescription());
             product.setImage(productDTO.getImage().getOriginalFilename());
 
@@ -58,22 +58,6 @@ public class ProductService implements ProductServiceImp {
             product.setGender(gender);
             product.setBrand(brand);
             product.setCategory(category);
-
-//            List<Product> products = productRepository.findAll();
-//            for (Product product1: products) {
-//                if(product1.getGender() == product.getGender()) {
-//                    product.setGender(product1.getGender());
-//                }
-//                if(product1.getBrand() == product.getBrand()) {
-//                    product.setBrand(product1.getBrand());
-//                }
-//                if(product1.getCategory() == product.getCategory()) {
-//                    product.setCategory(product1.getCategory());
-//                }
-//            }
-//                Product existingProduct = productRepository.findByBrandAndCategoryAndGender(product.getGender().getId(), product.getBrand().getId(), product.getCategory().getId());
-
-
 
             productRepository.save(product);
 
@@ -111,6 +95,7 @@ public class ProductService implements ProductServiceImp {
     private static ProductResponse getResponse(Product product) {
         ProductResponse productResponse = new ProductResponse();
 
+        productResponse.setProductId(product.getId());
         productResponse.setProductName(product.getProductName());
         productResponse.setGender(product.getGender().getGenderName());
         productResponse.setQty(product.getQty());
@@ -128,6 +113,7 @@ public class ProductService implements ProductServiceImp {
 
         ProductResponse productResponse = new ProductResponse();
 
+        productResponse.setProductId(product.getId());
         productResponse.setProductName(product.getProductName());
         productResponse.setPrice(product.getPrice());
         productResponse.setGender(product.getGender().getGenderName());
