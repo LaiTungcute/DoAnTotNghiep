@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 public interface ProductServiceImp {
     boolean isInsert(ProductDTO productDTO);
 
-    ProductPageResponse getAllProducts(int pageNum, int pageSize, String brandName, String categoryName);
+    ProductPageResponse getAllProducts(int pageNum, int pageSize, String brandName, String categoryName, String productName);
 
     ProductResponse getProductById(int id);
 

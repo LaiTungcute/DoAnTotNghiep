@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Integer> {
-    Order findByUserId(long userId);
+    List<Order> findByUserId(long userId);
 
     List<Order> findAllByDateBetween(LocalDate startDate, LocalDate endDate);
 

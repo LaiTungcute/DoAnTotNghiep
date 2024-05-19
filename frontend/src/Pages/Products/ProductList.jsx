@@ -2,19 +2,27 @@ import React, { useEffect, useState } from "react";
 import CardItem from "../../Components/Card";
 import Navbar from "../../Components/Navbar";
 import Body from "../../Components/Body";
-import Banner from "../../Components/Banner";
 import axiosClient from "../../API/Config";
 import Pagination from "../../Components/panigation";
 import { useNavigate } from "react-router-dom";
 import Footer from "../../Components/Footer/Footer";
 
-const Home = () => {
+const ProductList = () => {
   // Dữ liệu mẫu cho các card items
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 6; // Kích thước trang
   const [totalItems, settotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+
+  const [categoryNames, setCategoryNames] = useState([]);
+  const [brandNames, setBrandNames] = useState([]);
+
+  const [product, setProduct] = useState({
+    productName: null,
+    categoryName: null,
+    brandName: null,
+  });
 
   const navigate = useNavigate();
 
@@ -24,6 +32,9 @@ const Home = () => {
         params: {
           currentPage: currentPage - 1,
           pageSize,
+          productName: product.productName,
+          categoryName: product.categoryName,
+          brandName: product.brandName,
         },
       });
 
@@ -35,13 +46,22 @@ const Home = () => {
     }
   };
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setProduct({
+      ...product,
+      [name]: value,
+    });
+  };
+
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
   };
 
   useEffect(() => {
     fetchData();
-  }, [currentPage]);
+  }, [currentPage, product]);
 
   const url = "http://localhost:8080/api/product/file";
 
@@ -49,13 +69,76 @@ const Home = () => {
     navigate(`/productdetail/${id}`);
   };
 
+  const fetchCategoryNames = async () => {
+    try {
+      const data = await axiosClient.get("/category/");
+
+      setCategoryNames(data.data);
+    } catch (error) {
+      console.log("Error");
+    }
+  };
+
+  useEffect(() => {
+    fetchCategoryNames();
+  }, []);
+
+  const fetchBrandNames = async () => {
+    try {
+      const data = await axiosClient.get("/brand/");
+
+      setBrandNames(data.data);
+    } catch (error) {
+      console.log("Error");
+    }
+  };
+
+  useEffect(() => {
+    fetchBrandNames();
+  }, []);
+
   return (
     <>
       <Navbar />
       <Body>
         <img src={url} alt="" />
 
-        <Banner />
+        <div className="relative bg-cover bg-center bg-lime-300 h-20 my-2 py-2">
+          <input
+            type="text"
+            name="productName"
+            className="mt-1 p-2 w-80 border-2 rounded mx-10"
+            value={product.productName}
+            onChange={handleChange}
+          />
+          <select
+            name="categoryName"
+            id=""
+            onChange={handleChange}
+            className="mt-1 p-2 w-80 border-2 rounded mx-10 cursor-pointer"
+          >
+            <option value="">Chọn loại hàng</option>
+            {categoryNames.map((item, index) => (
+              <option key={item.categoryId} value={item.categoryName}>
+                {item.categoryName}
+              </option>
+            ))}
+          </select>
+
+          <select
+            name="brandName"
+            id=""
+            onChange={handleChange}
+            className="mt-1 p-2 w-80 border-2 rounded cursor-pointer"
+          >
+            <option value="">Chọn thương hiệu</option>
+            {brandNames.map((item, index) => (
+              <option key={item.brandId} value={item.brandName}>
+                {item.brandName}
+              </option>
+            ))}
+          </select>
+        </div>
         {/* Hiển thị sản phẩm trên trang hiện tại */}
         <div className="container mx-auto py-8">
           {/* Lưới (grid) chứa các card items */}
@@ -81,9 +164,6 @@ const Home = () => {
           totalPage={totalPages}
           onPageChange={handlePageChange}
         />
-
-        {/* <h1 className="text-center "></h1> */}
-
         <div style={{ marginTop: "10px" }}>
           <Footer />
         </div>
@@ -92,4 +172,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default ProductList;

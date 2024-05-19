@@ -17,6 +17,9 @@ const Navbar = () => {
           <Link to="/" className="text-white hover:text-gray-400">
             Trang chủ
           </Link>
+          <Link to="/product" className="text-white hover:text-gray-400">
+            Sản phẩm
+          </Link>
         </div>
         <div className="space-x-4">
           {!accessToken && (
@@ -34,10 +37,12 @@ const Navbar = () => {
           )}
 
           <Link to="/order">
-            <FontAwesomeIcon
-              icon={faCartShopping}
-              style={{ color: "white", fontSize: "25px", marginLeft: "30px" }}
-            />
+            {accessToken && (
+              <FontAwesomeIcon
+                icon={faCartShopping}
+                style={{ color: "white", fontSize: "25px", marginLeft: "30px" }}
+              />
+            )}
           </Link>
         </div>
       </div>

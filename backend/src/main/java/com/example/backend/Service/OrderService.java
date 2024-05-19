@@ -3,10 +3,7 @@ package com.example.backend.Service;
 import com.example.backend.DTO.OrderDTO;
 import com.example.backend.DTO.OrderStatusDTO;
 import com.example.backend.Entity.*;
-import com.example.backend.Repository.OrderDetailRepository;
-import com.example.backend.Repository.OrderRepository;
-import com.example.backend.Repository.ProductRepository;
-import com.example.backend.Repository.UserRepository;
+import com.example.backend.Repository.*;
 import com.example.backend.Response.OrderDetailResponse;
 import com.example.backend.Response.OrderPageResponse;
 import com.example.backend.Response.OrderResponse;
@@ -18,10 +15,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class OrderService {
@@ -29,38 +23,44 @@ public class OrderService {
     private OrderRepository orderRepository;
 
     @Autowired
-    private OrderDetailRepository orderDetailRepository;
+    private CartRepository cartRepository;
 
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private ProductRepository productRepository;
+    public Order createOrderFromCart(Long userId, int cartId, String address, String receiver, String phoneNumber) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        Cart cart = cartRepository.findById(cartId).orElseThrow(() -> new RuntimeException("Cart not found"));
 
-    public OrderResponse getAllOrderByUserId(long userId) {
-       try {
-           Order order = orderRepository.findByUserId(userId);
-           OrderResponse orderResponse = new OrderResponse();
+        Order order = new Order();
+        order.setUser(user);
+        order.setDate(LocalDate.now());
 
-           List<OrderDetailResponse> orderDetailResponses = new ArrayList<>();
+        List<OrderDetail> orderItems = new ArrayList<>();
+        long totalAmount = 0;
 
-           List<OrderDetail> orderDetails = order.getOrderDetails();
+        for (CartItem cartItem : cart.getCartItems()) {
+            OrderDetail orderItem = new OrderDetail();
+            orderItem.setProduct(cartItem.getProduct());
+            orderItem.setQty(cartItem.getQty());
+            orderItem.setPrice(cartItem.getProduct().getPrice() * cartItem.getQty());
+            totalAmount += orderItem.getPrice();
+            orderItems.add(orderItem);
+        }
 
-           for (OrderDetail orderDetail: orderDetails) {
-               OrderDetailResponse orderDetailResponse = mapToDetailResponse(orderDetail);
+        order.setOrderDetails(orderItems);
+        order.setTotalPrice(totalAmount);
+        order.setAddress(address);
+        order.setReceiver(receiver);
+        order.setPhoneNumber(phoneNumber);
 
-               orderDetailResponses.add(orderDetailResponse);
-           }
+        // Lưu đơn hàng
+        Order savedOrder = orderRepository.save(order);
 
-           orderResponse.setUserId(Math.toIntExact(order.getUser().getId()));
-           orderResponse.setId(order.getId());
-           orderResponse.setOrderDetailResponses(orderDetailResponses);
-           orderResponse.setTotalPrice(order.getTotalPrice());
+        // Xóa giỏ hàng sau khi tạo đơn hàng
+        cartRepository.delete(cart);
 
-           return orderResponse;
-       } catch (Exception e) {
-           return null;
-       }
+        return savedOrder;
     }
 
     private OrderDetailResponse mapToDetailResponse(OrderDetail orderDetail) {
@@ -93,6 +93,7 @@ public class OrderService {
         }
         orderResponse.setStatus(order.getStatus());
         orderResponse.setUsername(order.getUser().getUsername());
+        orderResponse.setAddress(order.getAddress());
 
         orderResponse.setOrderDetailResponses(orderDetailResponses);
         return orderResponse;
@@ -124,97 +125,11 @@ public class OrderService {
         return orderPageResponse;
     }
 
-    public boolean addOrder(OrderDTO orderDTO) {
-        Order order = orderRepository.findByUserId(orderDTO.getUserId());
-
-        User user = userRepository.findById(orderDTO.getUserId()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
-        Product product = productRepository.findById(orderDTO.getProductId()).orElseThrow(() -> new UsernameNotFoundException("Product not found"));
-
-
-        if (order == null) {
-            order = new Order();
-            order.setUser(user);
-            order.setStatus(1);
-            orderRepository.save(order);
-        }
-
-        // Kiểm tra xem sản phẩm đã tồn tại trong giỏ hàng chưa
-        Optional<OrderDetail> existingItem = order.getOrderDetails().stream()
-                .filter(item -> item.getProduct().getId() == orderDTO.getProductId())
-                .findFirst();
-
-        if (existingItem.isPresent()) {
-            // Nếu đã tồn tại, cập nhật số lượng sản phẩm
-            OrderDetail item = existingItem.get();
-            item.setQty(item.getQty() + orderDTO.getQuantity());
-            orderDetailRepository.save(item);
-        } else {
-            // Nếu chưa tồn tại, thêm sản phẩm mới vào giỏ hàng
-            OrderDetail newItem = new OrderDetail();
-            newItem.setProduct(product);
-            newItem.setQty(orderDTO.getQuantity());
-            newItem.setPrice(product.getPrice());
-            newItem.setOrder(order);
-
-            List<OrderDetail> orderDetails = order.getOrderDetails();
-
-            orderDetails.add(newItem);
-
-            orderDetailRepository.save(newItem);
-        }
-
-        LocalDate date = LocalDate.now();
-        order.setDate(date);
-
-        order.setTotalPrice(totalPrice(orderDTO.getUserId()));
-        // Cập nhật giỏ hàng
-        orderRepository.save(order);
-        return true;
-    }
-
-    private long totalPrice(long userId) {
-        Order order = orderRepository.findByUserId(userId);
-        if (order == null) {
-            return 0;
-        }
-        return order.getOrderDetails().stream()
-                .mapToLong(item -> item.getQty() * item.getPrice())
-                .sum();
-    }
-
     public boolean changeStatus(OrderStatusDTO status, int orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new UsernameNotFoundException("Order not found"));
         if(order == null) return false;
         order.setStatus(status.getStatus());
         orderRepository.save(order);
         return true;
-    }
-
-    public boolean deleteOrderDetail(int userId, int orderDetailId) {
-        Order order = orderRepository.findByUserId(userId);
-
-        orderDetailRepository.deleteById(orderDetailId);
-
-        updateTotalPrice(order);
-
-        return true;
-    }
-
-    private void updateTotalPrice(Order order) {
-        // Lấy danh sách cart item còn lại trong giỏ hàng
-        List<OrderDetail> cartItems = order.getOrderDetails();
-
-        // Tính tổng giá mới của giỏ hàng
-        long totalPrice = 0;
-        for (OrderDetail item : cartItems) {
-            totalPrice += item.getPrice() * item.getQty();
-        }
-
-        // Cập nhật totalPrice trong giỏ hàng
-        order.setTotalPrice(totalPrice);
-
-        // Lưu cập nhật vào cơ sở dữ liệu
-        orderRepository.save(order);
     }
 }

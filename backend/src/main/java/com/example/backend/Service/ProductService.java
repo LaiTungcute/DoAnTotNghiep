@@ -68,9 +68,9 @@ public class ProductService implements ProductServiceImp {
     }
 
     @Override
-    public ProductPageResponse getAllProducts(int pageNum, int pageSize, String brandName, String categoryName) {
+    public ProductPageResponse getAllProducts(int pageNum, int pageSize, String brandName, String categoryName, String productName) {
         Pageable pageable = PageRequest.of(pageNum, pageSize);
-        Page<Product> listData = productRepository.findProducts(pageable, brandName, categoryName);
+        Page<Product> listData = productRepository.findProducts(pageable, brandName, categoryName, productName);
 
         int totalPages = listData.getTotalPages();
         long totalItems = listData.getTotalElements();

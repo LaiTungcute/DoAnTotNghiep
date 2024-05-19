@@ -114,20 +114,9 @@ function OrderManagment() {
                   </tr>
                 </>
               )}
-              <td className="py-2 px-4 border-b">
-                <select
-                  id="status"
-                  name="status"
-                  value={order.status}
-                  onChange={(e) => handleChange(order.id, e.target.value)}
-                  className="mt-1 p-2 w-full border rounded"
-                  required
-                >
-                  <option value="1">Đang đặt hàng</option>
-                  <option value="2">Đã đặt hàng</option>
-                  <option value="3">Đã hủy</option>
-                </select>
-              </td>
+              <td className="py-2 px-4 border-b">{order.status}</td>
+
+              {/* c */}
             </tr>
           ))}
         </tbody>

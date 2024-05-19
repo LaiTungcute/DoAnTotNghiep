@@ -42,8 +42,9 @@ public class ProductController {
     public ResponseEntity<?> getAllProduct(@RequestParam(value = "currentPage", defaultValue = "0") int pageNum,
                                            @RequestParam(value = "pageSize", defaultValue = "6") int pageSize,
                                            @RequestParam(value = "brandName", required = false) String brandName,
-                                           @RequestParam(value = "categoryName", required = false) String categoryName) {
-        ProductPageResponse productPageResponse = productServiceImp.getAllProducts(pageNum, pageSize, brandName, categoryName);
+                                           @RequestParam(value = "categoryName", required = false) String categoryName,
+                                           @RequestParam(value = "productName", required = false) String productName) {
+        ProductPageResponse productPageResponse = productServiceImp.getAllProducts(pageNum, pageSize, brandName, categoryName, productName);
         return ResponseEntity.ok(productPageResponse);
     }
 

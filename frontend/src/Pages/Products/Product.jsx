@@ -3,6 +3,7 @@ import axiosClient from "../../API/Config";
 import { useNavigate, useParams } from "react-router-dom";
 import Body from "../../Components/Body";
 import Navbar from "../../Components/Navbar";
+import Footer from "../../Components/Footer/Footer";
 
 function ProductDetail() {
   const { id } = useParams();
@@ -32,7 +33,7 @@ function ProductDetail() {
 
   const handleBuy = async (productId) => {
     try {
-      await axiosClient.post("/order/create", {
+      await axiosClient.post("/cart/create", {
         userId,
         productId: productId,
         quantity: 1,
@@ -94,6 +95,9 @@ function ProductDetail() {
               Mua hàng
             </button>
           </div>
+        </div>
+        <div style={{ marginTop: "10px" }}>
+          <Footer />
         </div>
       </Body>
     </div>

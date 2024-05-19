@@ -9,19 +9,18 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "Orders")
+@Table(name = "Cart")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Order {
+public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "order_id")
+    @Column(name = "cart_id")
     private int id;
 
     @Column(name = "created_date")
@@ -30,23 +29,11 @@ public class Order {
     @Column(name = "total_price")
     private long totalPrice;
 
-    @Column(name="status")
-    private int status;
-
-    @Column(name = "address")
-    private String address;
-
-    @Column(name = "receiver")
-    private String receiver;
-
-    @Column(name = "phone_number")
-    private String phoneNumber;
-
     @JsonIgnore
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "order")
-    private List<OrderDetail> orderDetails = new ArrayList<>();
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CartItem> cartItems = new ArrayList<>();
 }
