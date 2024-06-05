@@ -18,12 +18,12 @@ function Sidebar() {
             </Link>
           </li>
           <li>
-            <Link to="/customers" className="block py-2">
-              Quản lý khách hàng
+            <Link to="/admin/brand" className="block py-2">
+              Quản lý hãng sản xuất
             </Link>
           </li>
           <li>
-            <Link to="/revenue" className="block py-2">
+            <Link to="/admin/revenue" className="block py-2">
               Báo cáo
             </Link>
           </li>

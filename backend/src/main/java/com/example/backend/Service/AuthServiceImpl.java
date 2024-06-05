@@ -47,25 +47,30 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public JWTAuthResponse login(LoginDTO loginDto) {
         JWTAuthResponse response = new JWTAuthResponse();
-           Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                   loginDto.getUsername(), loginDto.getPassword()));
-           SecurityContextHolder.getContext().setAuthentication(authentication);
+        try {
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                    loginDto.getUsername(), loginDto.getPassword()));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-           String token = jwtTokenProvider.generateToken(authentication);
+            String token = jwtTokenProvider.generateToken(authentication);
 
-           UserDetailImp userDetails = (UserDetailImp) authentication.getPrincipal();
+            UserDetailImp userDetails = (UserDetailImp) authentication.getPrincipal();
 
-           List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority()).collect(Collectors.toList());
+            List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority()).collect(Collectors.toList());
 
-           long userId = userDetails.getId();
-           String username = userDetails.getUsername();
-           String email = userDetails.getEmail();
-           String phoneNumber = userDetails.getPhoneNumber();
+            long userId = userDetails.getId();
+            String username = userDetails.getUsername();
+            String email = userDetails.getEmail();
+            String phoneNumber = userDetails.getPhoneNumber();
 
-        UserResponse userResponse = new UserResponse(userId, username, email, phoneNumber, roles);
+            UserResponse userResponse = new UserResponse(userId, username, email, phoneNumber, roles);
 
-           response.setAccessToken(token);
-           response.setUser(userResponse);
+            response.setAccessToken(token);
+            response.setUser(userResponse);
+
+        }catch (Exception e) {
+            response = null;
+        }
 
         return response;
     }

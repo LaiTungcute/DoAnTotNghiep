@@ -37,7 +37,10 @@ instance.interceptors.response.use(
     // Làm gì đó với lỗi response
     const { data, status, config } = error.response;
 
-    if (status === 400 && config.url === "/auth/signup") {
+    if (
+      status === 400 &&
+      (config.url === "/auth/signup" || config.url === "/auth/login")
+    ) {
       throw new Error(data);
     }
     return Promise.reject(error);

@@ -107,7 +107,7 @@ function ProductManagement() {
   return (
     <div
       className="p-4"
-      style={{ height: "calc(100vh - 116px)", overflowY: "auto" }}
+      style={{ height: "calc(100vh - 112px)", overflowY: "auto" }}
     >
       <h2 className="text-2xl font-bold mb-4">Quản lý sản phẩm</h2>
 

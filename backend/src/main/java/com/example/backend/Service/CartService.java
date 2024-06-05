@@ -112,6 +112,10 @@ public class CartService {
 
             cartItems.add(newItem);
 
+            int qty = product.getQty() - cartDTO.getQuantity();
+            product.setQty(qty);
+            productRepository.save(product);
+
             cartItemRepository.save(newItem);
         }
 

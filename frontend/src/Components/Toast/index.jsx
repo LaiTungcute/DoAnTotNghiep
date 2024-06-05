@@ -16,7 +16,7 @@ const Toast = ({ message, type, onClose }) => {
   // Trả về thành phần Toast
   return (
     <div
-      className={`fixed top-4 right-4 p-4 rounded shadow-lg ${getToastClass(
+      className={`fixed top-5 right-4 p-4 rounded shadow-lg z-50 ${getToastClass(
         type
       )}`}
     >

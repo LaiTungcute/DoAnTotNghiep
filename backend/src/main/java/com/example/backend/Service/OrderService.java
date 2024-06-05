@@ -4,9 +4,7 @@ import com.example.backend.DTO.OrderDTO;
 import com.example.backend.DTO.OrderStatusDTO;
 import com.example.backend.Entity.*;
 import com.example.backend.Repository.*;
-import com.example.backend.Response.OrderDetailResponse;
-import com.example.backend.Response.OrderPageResponse;
-import com.example.backend.Response.OrderResponse;
+import com.example.backend.Response.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
@@ -28,6 +27,9 @@ public class OrderService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private OrderDetailRepository orderDetailRepository;
+
     public Order createOrderFromCart(Long userId, int cartId, String address, String receiver, String phoneNumber) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         Cart cart = cartRepository.findById(cartId).orElseThrow(() -> new RuntimeException("Cart not found"));
@@ -35,6 +37,7 @@ public class OrderService {
         Order order = new Order();
         order.setUser(user);
         order.setDate(LocalDate.now());
+        orderRepository.save(order);
 
         List<OrderDetail> orderItems = new ArrayList<>();
         long totalAmount = 0;
@@ -45,7 +48,9 @@ public class OrderService {
             orderItem.setQty(cartItem.getQty());
             orderItem.setPrice(cartItem.getProduct().getPrice() * cartItem.getQty());
             totalAmount += orderItem.getPrice();
+            orderItem.setOrder(order);
             orderItems.add(orderItem);
+            orderDetailRepository.save(orderItem);
         }
 
         order.setOrderDetails(orderItems);
@@ -53,14 +58,15 @@ public class OrderService {
         order.setAddress(address);
         order.setReceiver(receiver);
         order.setPhoneNumber(phoneNumber);
+        order.setStatus(1);
 
         // Lưu đơn hàng
-        Order savedOrder = orderRepository.save(order);
+        orderRepository.save(order);
 
         // Xóa giỏ hàng sau khi tạo đơn hàng
         cartRepository.delete(cart);
 
-        return savedOrder;
+        return order;
     }
 
     private OrderDetailResponse mapToDetailResponse(OrderDetail orderDetail) {
@@ -125,6 +131,34 @@ public class OrderService {
         return orderPageResponse;
     }
 
+    public List<OrderResponse> getAllOrderByUserId(long userId) {
+        try {
+            List<Order> orderList = orderRepository.findByUserId(userId);
+            List<OrderResponse> orderResponseList = new ArrayList<>();
+
+            for (Order order: orderList) {
+                OrderResponse orderResponse = mapToResponse(order);
+
+                orderResponseList.add(orderResponse);
+            }
+
+            return orderResponseList;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public OrderResponse getAllOrderByOrderId(int orderId) {
+        try {
+            Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+            OrderResponse orderResponse = mapToResponse(order);
+
+            return orderResponse;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public boolean changeStatus(OrderStatusDTO status, int orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new UsernameNotFoundException("Order not found"));
         if(order == null) return false;
@@ -132,4 +166,29 @@ public class OrderService {
         orderRepository.save(order);
         return true;
     }
+
+    public List<DailyRevenue> getDailyRevenue(LocalDate startDate, LocalDate endDate) {
+        List<Object[]> results = orderRepository.findDailyRevenue(startDate, endDate);
+        return results.stream()
+                .map(result -> new DailyRevenue((LocalDate) result[0], (long) result[1], (long) result[2]))
+                .collect(Collectors.toList());
+    }
+
+    public OrderStatusResponse orderStatusResponse() {
+        List<Order> orders = orderRepository.findAll();
+        int daGiao = 0;
+        int dangCho = 0;
+        int daNhan = 0;
+        int daHuy = 0;
+        for (Order order: orders) {
+            if (order.getStatus() == 1) dangCho ++;
+            if (order.getStatus() == 2) daGiao ++;
+            if (order.getStatus() == 3) daNhan ++;
+            if (order.getStatus() == 4) daHuy ++;
+        }
+        OrderStatusResponse orderStatusResponse = new OrderStatusResponse(daGiao, dangCho, daNhan, daHuy);
+
+        return orderStatusResponse;
+    }
 }
+

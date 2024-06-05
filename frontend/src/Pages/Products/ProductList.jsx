@@ -15,6 +15,8 @@ const ProductList = () => {
   const [totalItems, settotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
+  const userId = JSON.parse(localStorage.getItem("user")).id;
+
   const [categoryNames, setCategoryNames] = useState([]);
   const [brandNames, setBrandNames] = useState([]);
 
@@ -66,7 +68,11 @@ const ProductList = () => {
   const url = "http://localhost:8080/api/product/file";
 
   const handleCard = (id) => {
-    navigate(`/productdetail/${id}`);
+    if (!userId) {
+      navigate("/error");
+    } else {
+      navigate(`/productdetail/${id}`);
+    }
   };
 
   const fetchCategoryNames = async () => {
@@ -107,6 +113,7 @@ const ProductList = () => {
           <input
             type="text"
             name="productName"
+            placeholder="Sản phẩm"
             className="mt-1 p-2 w-80 border-2 rounded mx-10"
             value={product.productName}
             onChange={handleChange}

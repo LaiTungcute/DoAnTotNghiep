@@ -14,7 +14,7 @@ function Transaction() {
     receiver: "",
     phoneNumber: "",
   });
-  const [cartId, setCarId] = useState(0);
+  const [cartId, setCarId] = useState("");
 
   const [payment, setPayment] = useState("");
 
@@ -29,7 +29,7 @@ function Transaction() {
     phoneNumber: Yup.string().required("Số điện thoại là bắt buộc"),
   });
 
-  const userId = JSON.parse(localStorage.getItem("user")).id;
+  // const userId = JSON.parse(localStorage.getItem("user")).id;
 
   const user = JSON.parse(localStorage.getItem("user"));
   const url = "http://localhost:8080/api/product/file";
@@ -49,7 +49,7 @@ function Transaction() {
     };
 
     fetchCartItems();
-  }, [cartItems]);
+  }, []);
 
   const handleBack = () => {
     navigate("/order");

@@ -195,13 +195,6 @@ const ProductFormModal = ({
                 accept="image/*"
                 ref={fileInputRef}
               />
-              {imagePreview && (
-                <img
-                  src={`${url}/${product.image}`}
-                  alt="Image preview"
-                  className="w-32 h-32"
-                />
-              )}
             </div>
 
             <div className="mb-4">

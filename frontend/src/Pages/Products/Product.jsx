@@ -9,6 +9,7 @@ function ProductDetail() {
   const { id } = useParams();
   const userId = JSON.parse(localStorage.getItem("user")).id;
   const navigate = useNavigate();
+  const [quantity, setQuantity] = useState(1);
 
   const url = "http://localhost:8080/api/product/file";
   const [data, setData] = useState({
@@ -36,11 +37,11 @@ function ProductDetail() {
       await axiosClient.post("/cart/create", {
         userId,
         productId: productId,
-        quantity: 1,
+        quantity,
         price: data.price,
       });
 
-      navigate("/order");
+      navigate("/cart");
     } catch (error) {
       console.log(error);
     }
@@ -73,7 +74,24 @@ function ProductDetail() {
             <p className="text-2xl text-green-500">Giá: {data.price}</p>
 
             {/* Số lượng sản phẩm */}
-            <p className="text-lg">Số lượng: {data.qty}</p>
+            <p className="text-lg">
+              Số lượng:
+              <button
+                className="bg-amber-300 text-white mx-3 px-3 rounded hover:bg-amber-400"
+                onClick={() => setQuantity((pr) => pr - 1)}
+                disabled={quantity == 1 ? true : false}
+              >
+                -
+              </button>
+              {quantity}
+              <button
+                className="bg-amber-300 text-white px-2 mx-3 rounded hover:bg-amber-400"
+                onClick={() => setQuantity((pr) => pr + 1)}
+                disabled={quantity == data.qty ? true : false}
+              >
+                +
+              </button>
+            </p>
 
             {/* Giới tính */}
             <p className="text-lg">Giới tính: {data.gender}</p>

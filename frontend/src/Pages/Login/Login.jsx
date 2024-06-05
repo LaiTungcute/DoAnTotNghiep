@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup"; // Thư viện để xác thực form
 import "tailwindcss/tailwind.css"; // Đảm bảo Tailwind CSS đã được import
@@ -9,11 +9,23 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "../../Redux/userSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
+import Toast from "../../Components/Toast";
 
 const Login = () => {
   const dispatch = useDispatch();
 
   const navigate = useNavigate();
+
+  //toast
+  const [toast, setToast] = useState(null);
+  // Hàm kích hoạt thông báo
+  const showToast = (message, type) => {
+    setToast({ message, type });
+    // Tự động ẩn thông báo sau 3 giây
+    setTimeout(() => {
+      setToast(null);
+    }, 3000);
+  };
 
   // Xác thực form với Yup
   const validationSchema = Yup.object({
@@ -27,10 +39,10 @@ const Login = () => {
       const action = login(values);
       const resultAction = await dispatch(action);
       const datas = unwrapResult(resultAction);
-
+      showToast("Login successfully", "success");
       navigate("/");
     } catch (error) {
-      // showToast(error.message, "error");
+      showToast(error.message, "error");
     }
   };
 
@@ -108,6 +120,13 @@ const Login = () => {
           </div>
         </div>
       </Body>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </>
   );
 };

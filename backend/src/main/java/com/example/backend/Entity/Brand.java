@@ -32,6 +32,6 @@ public class Brand {
     private String image;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "brand")
+    @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Product> products;
 }

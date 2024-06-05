@@ -49,6 +49,21 @@ const Home = () => {
     navigate(`/productdetail/${id}`);
   };
 
+  const [brand, setBrand] = useState([]);
+
+  const fetchBrand = async () => {
+    try {
+      const data = await axiosClient.get("/brand/");
+      setBrand(data.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchBrand();
+  }, []);
+
   return (
     <>
       <Navbar />
@@ -58,9 +73,10 @@ const Home = () => {
         <Banner />
         {/* Hiển thị sản phẩm trên trang hiện tại */}
         <div className="container mx-auto py-8">
-          {/* Lưới (grid) chứa các card items */}
+          <h1 className="text-center text-4xl mb-10 font-bold bg-green-400 py-5">
+            Sản phẩm
+          </h1>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Tạo một card item cho mỗi phần tử trong dữ liệu mẫu */}
             {data.map((item, index) => (
               <CardItem
                 key={index}
@@ -71,16 +87,30 @@ const Home = () => {
               />
             ))}
           </div>
-        </div>
 
-        {/* Phân trang */}
-        <Pagination
-          currentPage={currentPage}
-          pageSize={pageSize}
-          totalItem={totalItems}
-          totalPage={totalPages}
-          onPageChange={handlePageChange}
-        />
+          {/* Phân trang */}
+          <Pagination
+            currentPage={currentPage}
+            pageSize={pageSize}
+            totalItem={totalItems}
+            totalPage={totalPages}
+            onPageChange={handlePageChange}
+          />
+
+          <h1 className="text-center text-4xl mb-10 font-bold bg-green-400 py-5 mt-10">
+            Các hãng tài trợ
+          </h1>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {brand.map((item, index) => (
+              <img
+                key={index}
+                src={`${url}/${item.image}`}
+                alt={item.brandName}
+                className="w-full h-96 object-cover rounded-t-lg"
+              />
+            ))}
+          </div>
+        </div>
 
         {/* <h1 className="text-center "></h1> */}
 

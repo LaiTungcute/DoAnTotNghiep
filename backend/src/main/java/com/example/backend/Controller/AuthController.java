@@ -42,8 +42,11 @@ public class AuthController {
     // Build Login REST API
     @PostMapping("/login")
     public ResponseEntity<?> authenticate(@RequestBody LoginDTO loginDto){
-        JWTAuthResponse jwtAuthResponse = authService.login(loginDto);
-        return ResponseEntity.ok(jwtAuthResponse);
+            JWTAuthResponse jwtAuthResponse = authService.login(loginDto);
+            if (jwtAuthResponse == null) {
+                return ResponseEntity.badRequest().body("Username or password is not true");
+            }
+            return ResponseEntity.ok(jwtAuthResponse);
     }
 
     @PostMapping("/signup")

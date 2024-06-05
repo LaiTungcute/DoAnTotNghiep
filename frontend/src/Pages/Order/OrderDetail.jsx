@@ -3,11 +3,13 @@ import axiosClient from "../../API/Config";
 import Navbar from "../../Components/Navbar";
 import Body from "../../Components/Body";
 import Footer from "../../Components/Footer/Footer";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-const CartTable = () => {
+const OrderDetail = () => {
+  const { id } = useParams();
+
   const navigate = useNavigate();
-  const [cartItems, setCartItems] = useState([]);
+  const [orderItems, setOrderItems] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
 
   const userId = JSON.parse(localStorage.getItem("user")).id;
@@ -17,47 +19,22 @@ const CartTable = () => {
 
   // Lấy dữ liệu giỏ hàng từ API
   useEffect(() => {
-    const fetchCartItems = async () => {
+    const fetchOrderItems = async () => {
       try {
         // Giả sử bạn có một API cho việc lấy giỏ hàng của người dùng
-        const response = await axiosClient.get(`/cart/${user.id}`);
-        setCartItems(response.data.cartItemResponses);
+        const response = await axiosClient.get(`/order/${id}`);
+        setOrderItems(response.data.orderDetailResponses);
         setTotalPrice(response.data.totalPrice);
       } catch (error) {
         console.error("Failed to fetch cart items:", error);
       }
     };
 
-    fetchCartItems();
-  }, [cartItems]);
-
-  console.log(cartItems);
-
-  // Xử lý xóa sản phẩm khỏi giỏ hàng
-  const handleRemoveItem = async (cartId) => {
-    try {
-      // Giả sử bạn có một API để xóa sản phẩm khỏi giỏ hàng
-      await axiosClient.delete(`/cart/delete/${userId}/${cartId}`);
-      // Cập nhật lại dữ liệu giỏ hàng
-      setCartItems(
-        cartItems.filter((item) => item.cartItemResponses.id !== cartId)
-      );
-      setTotalPrice(
-        totalPrice -
-          cartItems.find((item) => item.cartItemResponses.id === cartId).price *
-            cartItems.find((item) => item.cartItemResponses.id === cartId).qty
-      );
-    } catch (error) {
-      console.error("Failed to remove item:", error);
-    }
-  };
+    fetchOrderItems();
+  }, [orderItems]);
 
   const handleBack = () => {
-    navigate("/");
-  };
-
-  const handleTrans = () => {
-    navigate("/transaction");
+    navigate("/order");
   };
 
   return (
@@ -65,9 +42,9 @@ const CartTable = () => {
       <Navbar />
       <Body>
         <div className="container mx-auto p-6">
-          <h2 className="text-2xl font-bold mb-4">Giỏ Hàng</h2>
+          <h2 className="text-2xl font-bold mb-4">Đơn hàng chi tiết</h2>
 
-          {cartItems != null ? (
+          {orderItems != null ? (
             <>
               <table className="w-full border-collapse border border-gray-200 rounded-lg shadow-lg">
                 <thead className="bg-gray-100">
@@ -82,14 +59,11 @@ const CartTable = () => {
                     <th className="py-2 px-4 border-b border-gray-200">
                       Thành tiền
                     </th>
-                    <th className="py-2 px-4 border-b border-gray-200">
-                      Thao tác
-                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {cartItems != null &&
-                    cartItems.map((item) => (
+                  {orderItems != null &&
+                    orderItems.map((item) => (
                       <tr key={item}>
                         <td className="py-2 px-4 border-b border-gray-200">
                           <div className="flex items-center">
@@ -110,14 +84,6 @@ const CartTable = () => {
                         <td className="py-2 px-4 border-b border-gray-200">
                           {item.price * item.qty} VND
                         </td>
-                        <td className="py-2 px-4 border-b border-gray-200">
-                          <button
-                            className="bg-red-500 text-white px-2 py-1 rounded-lg"
-                            onClick={() => handleRemoveItem(item.id)}
-                          >
-                            Xóa
-                          </button>
-                        </td>
                       </tr>
                     ))}
                 </tbody>
@@ -127,18 +93,11 @@ const CartTable = () => {
                 <h3 className="text-xl font-semibold">
                   Tổng tiền: {totalPrice} VND
                 </h3>
-                {/* Nút thanh toán giỏ hàng */}
-                <button
-                  className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg mr-10"
-                  onClick={handleTrans}
-                >
-                  Thanh Toán
-                </button>
                 <button
                   className="mt-4 bg-red-500 text-white px-4 py-2 rounded-lg"
                   onClick={handleBack}
                 >
-                  Quay lại trang chủ
+                  Quay lại
                 </button>
               </div>
             </>
@@ -161,4 +120,4 @@ const CartTable = () => {
   );
 };
 
-export default CartTable;
+export default OrderDetail;

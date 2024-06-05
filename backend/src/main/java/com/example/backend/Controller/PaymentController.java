@@ -118,7 +118,7 @@ public class PaymentController {
                 Cart cart = cartRepository.findById(Integer.parseInt(queryParams.get("cartId")))
                         .orElseThrow(() -> new RuntimeException("Cart not found"));
                 Order order = orderService.createOrderFromCart(cart.getUser().getId(), cart.getId(), address, receiver, phoneNumber);
-
+                System.out.println(order);
                 System.out.println("ok");
             } else {
                 // Giao dịch thất bại

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Pagination from "../../panigation";
 import axiosClient from "../../../API/Config";
+import { useNavigate } from "react-router-dom";
 // import ProductFormModal from "./ProductFormModal";
 
 function OrderManagment() {
@@ -10,22 +11,30 @@ function OrderManagment() {
   const [totalItems, settotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
+  const navigate = useNavigate();
+
   const fetchData = async () => {
     try {
       const res = await axiosClient.get("/order", {
         params: {
           currentPage: currentPage - 1,
-          pageSize,
+          pageSize: pageSize,
         },
       });
 
       setData(res.data.order);
       console.log(data);
       settotalItems(res.data.totalItems);
-      setTotalPages(res.data.totalPage);
+      setTotalPages(res.data.totalPages);
+      console.log(totalItems);
+      console.log(totalPages);
     } catch (error) {
       console.log("Error");
     }
+  };
+
+  const handleDetail = (id) => {
+    navigate(`/admin/orderDetail/${id}`);
   };
 
   const handleChange = (orderId, newStatus) => {
@@ -47,9 +56,42 @@ function OrderManagment() {
       });
   };
 
+  const handleStatus = (values) => {
+    switch (values.status) {
+      case 1:
+        return (
+          <>
+            <button
+              onClick={() => handleChange(values.id, 2)}
+              className="mr-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+            >
+              Xác nhận
+            </button>
+            <button
+              onClick={() => handleChange(values.id, 4)}
+              className="mr-4 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+            >
+              Hủy
+            </button>
+          </>
+        );
+
+      case 2:
+        return <p>Đã giao</p>;
+
+      case 3:
+        return <p>Đã nhận</p>;
+
+      case 4:
+        return <p>Đã hủy</p>;
+      default:
+        break;
+    }
+  };
+
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [currentPage, totalItems]);
 
   const url = "http://localhost:8080/api/product/file";
 
@@ -61,22 +103,19 @@ function OrderManagment() {
   return (
     <div
       className="p-4"
-      style={{ height: "calc(100vh - 116px)", overflowY: "auto" }}
+      style={{ height: "calc(100vh - 112px)", overflowY: "auto" }}
     >
-      <h2 className="text-2xl font-bold mb-4">Quản lý sản phẩm</h2>
+      <h2 className="text-2xl font-bold mb-4">Quản lý đơn hàng</h2>
 
       {/* Bảng liệt kê sản phẩm */}
       <table className="min-w-full bg-white rounded-lg shadow-lg">
         <thead>
           <tr>
             <th className="py-2 px-4 bg-gray-100">Người dùng</th>
-            <th className="py-2 px-4 bg-gray-100">Mã giỏ hàng</th>
-            {/* <th className="py-2 px-4 bg-gray-100">Tên sản phẩm</th>
-            <th className="py-2 px-4 bg-gray-100">Số lượng</th>
-            <th className="py-2 px-4 bg-gray-100">Giá</th> */}
+            <th className="py-2 px-4 bg-gray-100">Mã đơn hàng</th>
             <th className="py-2 px-4 bg-gray-100">Sản phẩm</th>
             <th className="py-2 px-4 bg-gray-100">Trạng thái</th>
-            {/* <th className="py-2 px-4 bg-gray-100">Hành động</th> */}
+            <th className="py-2 px-4 bg-gray-100"></th>
           </tr>
         </thead>
         <tbody>
@@ -106,16 +145,23 @@ function OrderManagment() {
                   <tr>
                     <table>
                       <tr>
-                        <td className="py-2 px-4 border-b"></td>
-                        <td className="py-2 px-4 border-b">0</td>
-                        <td className="py-2 px-4 border-b">0</td>
+                        <td className="py-2 px-4 border-b"></td> <br />
+                        <td className="py-2 px-4 border-b">0</td> <br />
+                        <td className="py-2 px-4 border-b">0</td> <br />
                       </tr>
                     </table>
                   </tr>
                 </>
               )}
-              <td className="py-2 px-4 border-b">{order.status}</td>
-
+              <td className="py-2 px-4 border-b">{handleStatus(order)}</td>
+              <td className="py-2 px-4 border-b">
+                <button
+                  onClick={() => handleDetail(order.id)}
+                  className="mt-4 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+                >
+                  Chi tiết
+                </button>
+              </td>
               {/* c */}
             </tr>
           ))}
@@ -123,13 +169,15 @@ function OrderManagment() {
       </table>
 
       {/* Phân trang */}
-      <Pagination
-        currentPage={currentPage}
-        pageSize={pageSize}
-        totalItem={totalItems}
-        totalPage={totalPages}
-        onPageChange={handlePageChange}
-      />
+      {
+        <Pagination
+          currentPage={currentPage}
+          pageSize={pageSize}
+          totalItem={totalItems}
+          totalPage={totalPages}
+          onPageChange={handlePageChange}
+        />
+      }
     </div>
   );
 }
